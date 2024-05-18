@@ -21,6 +21,10 @@ contract SourceValue is ReentrancyGuard {
     address public wethArbSep = 0xE591bf0A0CF924A0674d7792db046B23CEbF5f34;
     address public routerArbSep = 0x2a9C5afB0d0e4BAb2BCdaE109EC4b0c4Be15a165;
 
+    uint64 public chainSelectorOpSep = 5224473277236331295;
+    address public wethOpSep = 0x4200000000000000000000000000000000000006;
+    address public routerOpSep = 0x114A20A10b43D4115e5aeef7345a1A71d2a60C57;
+
     struct Order {
         uint256 orderId;
         address owner;
@@ -105,18 +109,9 @@ contract SourceValue is ReentrancyGuard {
             isOver: false
         });
 
-        // bytes memory ccipData = abi.encode(orderId, collateralAmount, destinationToken, leverage, false);
-        // bytes memory ccipData = abi.encodeWithSignature(
-        //     "createOrderDis(uint256,address,uint256,address,uint256)",
-        //     orderId,
-        //     msg.sender,
-        //     collateralAmount,
-        //     destinationToken,
-        //     leverage
-        // );
+        bytes memory encodeData = abi.encode(orderId, msg.sender, collateralAmount, destinationToken, leverage);
 
-        bytes memory ccipData =
-            abi.encode(createCommand, orderId, msg.sender, collateralAmount, destinationToken, leverage);
+        bytes memory ccipData = abi.encode(createCommand, encodeData);
 
         // call ccip
         Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
@@ -163,7 +158,6 @@ contract SourceValue is ReentrancyGuard {
 
     // function increaseCollateralToOrder(uint orderId, uint addAmount) external {
     // }
-
     // function decreaseCollateralToOrder() external {
     // }
 
